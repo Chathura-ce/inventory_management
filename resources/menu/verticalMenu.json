@@ -56,6 +56,12 @@
       "icon": "menu-icon tf-icons bx bx-line-chart",
       "slug": "reports",
       "url": "/reports"
+    },
+    {
+      "name": "Forecast",
+      "icon": "menu-icon tf-icons bx bx-line-chart",
+      "slug": "forecast",
+      "url": "/forecast"
     }
   ]
 }

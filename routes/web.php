@@ -26,6 +26,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/stocks/store', [StockController::class, 'store'])->name('stocks.store');
 
     Route::get('/stock-history', [StockHistoryController::class, 'index'])->name('stock-history.index');
+
+    Route::get('/forecast', [\App\Http\Controllers\ForecastController::class, 'index'])->name('forecast.index');
+    Route::post('/forecast/data', [\App\Http\Controllers\ForecastController::class, 'getData'])->name('forecast.data');
+
 });
 
 

@@ -26,3 +26,4 @@ yarn-error.log
 !/public/assets/*
 /public/css
 /public/js
+/public/assets/~$sample-stock-import.xlsx
