@@ -5,5 +5,5 @@
 <!-- Content -->
 @yield('content')
 <!--/ Content -->
-
+@stack('scripts')
 @endsection

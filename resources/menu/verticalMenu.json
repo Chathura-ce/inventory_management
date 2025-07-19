@@ -18,8 +18,13 @@
         },
         {
           "name": "Stock",
-          "url": "/stock",
-          "slug": "stock"
+          "url": "/stocks/create",
+          "slug": "stocks"
+        },
+        {
+          "name": "Stock History",
+          "url": "/stock-history",
+          "slug": "stock-history"
         }
       ]
     },
