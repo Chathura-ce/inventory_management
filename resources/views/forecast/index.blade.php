@@ -19,8 +19,8 @@
                 <div class="col-md-6">
                     <select name="item" id="item" class="form-control" required>
                         <option value="">-- Select Product --</option>
-                        @foreach($products as $product)
-                            <option value="{{ $product }}">{{ $product }}</option>
+                        @foreach ($products as $id => $label)
+                            <option value="{{ $id }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -45,57 +45,66 @@
 
 @push('scripts')
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener('DOMContentLoaded', () => {
         const chartEl = document.getElementById('chart');
-        const table = document.getElementById('resultTable');
-        const tbody = table.querySelector('tbody');
-        let chart;
+        const table   = document.getElementById('resultTable');
+        const tbody   = table.querySelector('tbody');
+        let chart;    // ApexCharts instance
 
-        document.getElementById('forecastForm').addEventListener('submit', function (e) {
+        document.getElementById('forecastForm').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const item = document.getElementById('item').value;
 
-          fetch('{{ route('forecast.data') }}', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ item })
-          })
-            .then(response => response.json())
-            .then(data => {
-              const forecast = data.forecast;
+          const productId = document.getElementById('item').value;     // <select name="item">
+          const steps     = document.getElementById('steps')?.value || 10; // optional <input id="steps">
 
-              if (Array.isArray(forecast)) {
-                const labels = forecast.map(row => row.date);
-                const prices = forecast.map(row => row.price);
-
-                // Update Chart
-                if (chart) chart.destroy();
-                chart = new ApexCharts(chartEl, {
-                  chart: { type: 'line', height: 350 },
-                  series: [{ name: item + ' Price', data: prices }],
-                  xaxis: { categories: labels }
-                });
-                chart.render();
-
-                // Update Table
-                tbody.innerHTML = '';
-                forecast.forEach(entry => {
-                  tbody.innerHTML += `<tr><td>${entry.date}</td><td>${entry.price}</td></tr>`;
-                });
-                table.classList.remove('d-none');
-              } else {
-                alert('Prediction failed.');
-              }
-            })
-            .catch(error => {
-              console.error(error);
-              alert('Something went wrong. Try again.');
+          try {
+            const res = await fetch('{{ route('forecast.data') }}', {
+              method : 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+              },
+              body: JSON.stringify({ product_id: productId, steps })
             });
+
+            const data = await res.json();
+            if (!res.ok || !data.labels) throw new Error(data.error ?? 'Bad response');
+
+            const { labels, actual, forecast } = data;
+
+            /* ── 1. Chart ─────────────────────────────────────── */
+            if (chart) chart.destroy();
+            chart = new ApexCharts(chartEl, {
+              chart : { type: 'line', height: 350, toolbar: { show: false } },
+              series: [
+                { name: 'Actual',   data: actual },
+                { name: 'Forecast', data: forecast, dashArray: 6 }
+              ],
+              xaxis : { categories: labels, type: 'datetime' },
+              stroke: { curve: 'smooth' },
+              markers: { size: 0 },
+              tooltip: { shared: true },
+              noData : { text: 'Loading…' }
+            });
+            chart.render();
+
+            /* ── 2. Table ─────────────────────────────────────── */
+            tbody.innerHTML = labels.map((d, i) => `
+        <tr>
+          <td>${d}</td>
+          <td>${actual[i]   ?? '-'}</td>
+          <td>${forecast[i] ?? '-'}</td>
+        </tr>
+      `).join('');
+            table.classList.remove('d-none');
+
+          } catch (err) {
+            console.error(err);
+            alert('Prediction failed – please try again.');
+          }
         });
       });
     </script>
+
 
 @endpush
