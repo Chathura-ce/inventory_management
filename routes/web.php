@@ -36,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('sales/{sale}/receipt', [SaleController::class, 'receipt'])
         ->name('sales.receipt');
+    Route::resource('sales', SaleController::class)
+        ->only(['index','create','store','show']);
 
 });
 

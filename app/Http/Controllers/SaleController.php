@@ -99,11 +99,22 @@ class SaleController extends Controller
             ->with('success','Sale recorded successfully.');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $sales = Sale::withCount('items')->orderBy('sale_date','desc')->paginate(15);
+        // optional filter by date range or product
+        $query = Sale::withCount('items')->orderBy('sale_date','desc');
+
+        if ($request->filled('from')) {
+            $query->whereDate('sale_date','>=',$request->from);
+        }
+        if ($request->filled('to')) {
+            $query->whereDate('sale_date','<=',$request->to);
+        }
+
+        $sales = $query->paginate(15)->withQueryString();
         return view('sales.index', compact('sales'));
     }
+
 
     public function show(Sale $sale)
     {
