@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\StockHistoryController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/forecast', [\App\Http\Controllers\ForecastController::class, 'index'])->name('forecast.index');
     Route::post('/forecast/data', [\App\Http\Controllers\ForecastController::class, 'getData'])->name('forecast.data');
+
+    Route::resource('sales', SaleController::class)
+        ->only(['index','create','store','show']);
+
+    Route::get('sales/{sale}/receipt', [SaleController::class, 'receipt'])
+        ->name('sales.receipt');
 
 });
 
