@@ -21,12 +21,9 @@ class HistoricalPricesSeeder extends Seeder
     private array $productMap = [
         // 'CSV Item Name' => product_id,
         'Beans'            => 1,
-//        'Rice (Samba)'           => 2,
-//        'Big Onion (Imported)'   => 3,
-//        'Red Onion (Local)'      => 4,
-//        'Potato (Local)'         => 5,
-//        'Dhal (Red Split)'       => 6,
-        // …add the rest of your items here…
+        'Nadu'           => 2,
+        'Egg'           => 3,
+        'Salaya'           => 4,
     ];
 
     /**
@@ -41,6 +38,7 @@ class HistoricalPricesSeeder extends Seeder
 
     public function run(): void
     {
+        HistoricalPrice::truncate();
         if (! File::exists(base_path($this->csvPath))) {
             $this->command->error("CSV file not found: {$this->csvPath}");
             return;

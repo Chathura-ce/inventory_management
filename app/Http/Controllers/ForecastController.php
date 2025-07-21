@@ -11,8 +11,9 @@ class ForecastController extends Controller
     {
         $products = [
             1 => 'Beans',
-            2 => 'Nadu Rice',
-            3 => 'Dhal',
+            2 => 'Nadu',
+            3 => 'Egg',
+            4 => 'Salaya',
         ];
 
         // Later you can replace this with:
@@ -25,59 +26,86 @@ class ForecastController extends Controller
 
     public function getData(Request $request)
     {
-        $productId    = $request->input('product_id');
-        $historyWeeks = $request->input('history_weeks', 52);   // default: 1 year
-        $steps        = $request->input('steps', 10);           // default: 10 wks
+        // 1) Map product_id → item name
+        $map = [
+            1 => 'Beans',
+            2 => 'Nadu',
+            3 => 'Egg',
+            4 => 'Salaya',
+        ];
 
-        /* ── 1.  Roll daily prices into weekly averages ───────────────────── */
+        $productId    = $request->input('product_id');
+        $historyWeeks = $request->input('history_weeks', 52);
+        $periods      = $request->input('steps', 4);
+
+        if (! isset($map[$productId])) {
+            return response()->json(['error' => 'Invalid product_id'], 400);
+        }
+        $itemName = $map[$productId];
+
+        // 2) Roll daily → weekly history
         $daily = HistoricalPrice::query()
             ->where('product_id', $productId)
             ->whereDate('price_date', '>=', now()->subWeeks($historyWeeks))
             ->orderBy('price_date')
-            ->get(['price_date', 'pettah_wholesale']);          // adjust column
+            ->get(['price_date', 'narahenpita_retail']);
 
         $weeklyHistory = $daily
-            ->groupBy(fn ($row) => Carbon::parse($row->price_date)
-                ->startOfWeek()        // Mon-Sun ISO week
+            ->groupBy(fn($row) => Carbon::parse($row->price_date)
+                ->startOfWeek()
                 ->toDateString())
-            ->map(fn ($grp) => round($grp->avg('pettah_wholesale'), 2));
+            ->map(fn($grp) => round($grp->avg('narahenpita_retail'), 2));
 
-        /* ── 2.  Call FastAPI and build weekly forecast map ───────────────── */
-        $response = Http::timeout(180)
+        // 3) Build `history` payload
+        $historyPayload = $weeklyHistory
+            ->map(fn($price, $ds) => ['ds' => $ds, 'y' => $price])
+            ->values()
+            ->all();
+
+        // 4) Call FastAPI
+        $response = Http::timeout(60)
+            ->retry(1, 500)
             ->withOptions(['verify' => false])
             ->post('https://beans-forecast-api.onrender.com/predict', [
-                'steps'      => $steps,
-                'product_id' => $productId,
+                'item'    => $itemName,
+                'periods' => $periods,
+                'history' => $historyPayload,
             ]);
 
         if (! $response->successful()) {
-            return response()->json(['error' => 'Prediction failed.'], 500);
+            return response()->json([
+                'error' => 'Forecast API error',
+                'body'  => $response->body(),
+            ], 500);
         }
 
-        // FastAPI returns: { "forecast": [ { "date": "...", "price": ... }, ... ] }
-        $weeklyForecast = collect($response->json('forecast'))
-            ->mapWithKeys(fn ($row) => [
-                Carbon::parse($row['date'])
-                    ->startOfWeek()          // normalise to ISO week start
-                    ->toDateString() => (float) $row['price']
+        // 5) Parse `predictions`
+        $weeklyForecast = collect($response->json('predictions'))
+            ->mapWithKeys(fn($row) => [
+                Carbon::parse($row['ds'])
+                    ->startOfWeek()
+                    ->toDateString() => (float)$row['yhat']
             ]);
 
-        /* ── 3.  Merge history + forecast into chart-ready arrays ─────────── */
-        $labels = $weeklyHistory->keys()
-            ->merge($weeklyForecast->keys())
+// 6) Merge history + forecast keys and sort by date
+        $labels = collect($weeklyHistory->keys())
+            ->merge($weeklyForecast->keys())           // add the four future Mondays
             ->unique()
-            ->sort()   // chronological
+            ->sortBy(fn($d) => Carbon::parse($d))       // ensure chronological order
             ->values();
 
-        $actualSeries   = $labels->map(fn ($d) => $weeklyHistory[$d]   ?? null);
-        $forecastSeries = $labels->map(fn ($d) => $weeklyForecast[$d] ?? null);
+
+        $actualSeries   = $labels->map(fn($d) => $weeklyHistory[$d]   ?? null);
+        $forecastSeries = $labels->map(fn($d) => $weeklyForecast[$d] ?? null);
 
         return response()->json([
-            'labels'   => $labels,         // ["2025-05-26", "2025-06-02", …]
-            'actual'   => $actualSeries,   // [432.1, 431.7, null, 434.0, …]
-            'forecast' => $forecastSeries, // [null, null, 438.2, 439.1, …]
+            'labels'   => $labels,
+            'actual'   => $actualSeries,
+            'forecast' => $forecastSeries,
         ]);
     }
+
+
 
 
 }
