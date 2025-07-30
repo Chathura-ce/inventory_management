@@ -46,12 +46,6 @@
       ]
     },
     {
-      "name": "Customers",
-      "icon": "menu-icon tf-icons bx bx-user",
-      "slug": "customers",
-      "url": "/customers"
-    },
-    {
       "name": "Reports",
       "icon": "menu-icon tf-icons bx bx-line-chart",
       "slug": "reports",

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\StockHistoryController;
@@ -39,6 +40,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('sales', SaleController::class)
         ->only(['index','create','store','show']);
 
+
+    Route::prefix('reports')
+        ->group(function() {
+            Route::get('/',                 [ReportController::class, 'index'])            ->name('reports.index');
+            Route::get('sales-summary',     [ReportController::class, 'salesSummary'])     ->name('reports.salesSummary');
+            Route::get('stock-balance',     [ReportController::class, 'stockBalance'])     ->name('reports.stockBalance');
+            Route::get('stock-movement',    [ReportController::class, 'stockMovement'])    ->name('reports.stockMovement');
+        });
 });
 
 

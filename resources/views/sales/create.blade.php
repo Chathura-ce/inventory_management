@@ -147,7 +147,7 @@
             tr.innerHTML = `
                 <td>${item.name}</td>
                 <td style="width: 80px">
-                  <input type="number" value="${item.qty}" min="1" max="${item.stock}" class="form-control form-control-sm qty-input" data-id="${id}">
+                  <input style="width: 90px;" type="number" value="${item.qty}" min="1" max="${item.stock}" class="form-control form-control-sm qty-input" data-id="${id}">
                 </td>
 <td>${item.unit}</td>
                 <td>${item.lineTotal.toFixed(2)}</td>
