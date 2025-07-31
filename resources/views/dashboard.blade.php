@@ -15,26 +15,51 @@
 @endsection
 
 @section('content')
-    <div class="row">
-        <!-- Example Card -->
-        <div class="col-12 col-md-6 col-xl-4 mb-4">
-            <div class="card">
+    <div class="row gy-4">
+        {{-- Today's Sales --}}
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
                 <div class="card-body">
-                    <h5 class="card-title">Welcome!</h5>
-                    <p class="card-text">This is a clean dashboard layout. Add your widgets and content here.</p>
-                    <a href="javascript:void(0)" class="btn btn-primary">Get Started</a>
+                    <h5 class="card-title">Today's Sales</h5>
+                    <p class="card-text fs-3">₹{{ number_format($todaySales,2) }}</p>
+                    <small>{{ $todayOrders }} orders</small>
                 </div>
             </div>
         </div>
 
-        <!-- Chart Example -->
-        <div class="col-12 col-xl-8 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Analytics Chart</h5>
-                </div>
+        {{-- This Week's Sales --}}
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
                 <div class="card-body">
-                    <div id="totalRevenueChart"></div>
+                    <h5 class="card-title">This Week's Sales</h5>
+                    <p class="card-text fs-3">₹{{ number_format($weekSales,2) }}</p>
+                    <small>{{ $weekOrders }} orders</small>
+                </div>
+            </div>
+        </div>
+
+        {{-- Low Stock --}}
+        <div class="col-md-3">
+            <div class="card text-dark bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Low Stock Items</h5>
+                    <p class="card-text fs-3">{{ $lowStockItems->count() }}</p>
+                    <small>Items below reorder level</small>
+                </div>
+            </div>
+        </div>
+
+        {{-- Top Product --}}
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Top Product (7d)</h5>
+                    @if($topProduct)
+                        <p class="card-text fs-4">Product ID: {{ $topProduct->product_id }}</p>
+                        <small>Revenue: ₹{{ number_format($topProduct->revenue,2) }}</small>
+                    @else
+                        <p class="card-text">—</p>
+                    @endif
                 </div>
             </div>
         </div>
