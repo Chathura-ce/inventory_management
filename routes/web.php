@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -55,6 +56,15 @@ Route::middleware(['auth'])->group(function () {
             Route::get('stock-balance',     [ReportController::class, 'stockBalance'])     ->name('reports.stockBalance');
             Route::get('stock-movement',    [ReportController::class, 'stockMovement'])    ->name('reports.stockMovement');
         });
+
+    Route::get('notifications/unread',      [NotificationController::class,'unread'])    ->name('notifications.unread');
+
+    Route::get('notifications',             [NotificationController::class,'index'])     ->name('notifications.index');
+    Route::get('notifications/{id}',        [NotificationController::class,'show'])      ->name('notifications.show');
+    Route::post('notifications/{id}/read',  [NotificationController::class,'markRead'])->name('notifications.read');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])
+        ->name('notifications.readAll');
+
 });
 
 

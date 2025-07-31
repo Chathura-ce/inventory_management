@@ -28,7 +28,7 @@
                                 data-stock="{{ $p->stock }}">
 
                             <div class="fw-semibold text-truncate">{{ $p->name }}</div>
-                            <div class="text-primary">₹{{ number_format($p->price,2) }}</div>
+                            <div class="text-primary">Rs {{ number_format($p->price,2) }}</div>
                         </button>
                     </div>
                 @endforeach
@@ -115,7 +115,7 @@
           }
         });
 
-        cartTbody.addEventListener('input', e => {
+        cartTbody.addEventListener('change', e => {
           if (e.target.matches('.qty-input')) {
             const id  = e.target.dataset.id;
             let qty = parseInt(e.target.value);

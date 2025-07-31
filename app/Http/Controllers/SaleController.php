@@ -70,8 +70,9 @@ class SaleController extends Controller
                 $total    += $lineTotal;
 
                 // decrement stock
-                $product->decrement('quantity', $it['qty']);
-
+//                $product->decrement('quantity', $it['qty']);
+                $product->quantity -= $it['qty'];
+                $product->save();
                 // create each line‐item
                 SaleItem::create([
                     'sale_id'    => $sale->id,

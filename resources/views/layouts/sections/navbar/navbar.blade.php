@@ -39,44 +39,30 @@
                         <ul class="navbar-nav flex-row align-items-center ms-auto">
 
                             <!-- Place this tag where you want the button to render. -->
-                            @php $recentUnread = []; $unreadCount = 1;@endphp
                             <li class="nav-item dropdown me-4">
                                 <a class="nav-link position-relative" href="#" id="notificationDropdown"
                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bx bx-bell bx-md"></i>
-                                    @if($unreadCount)
-                                        <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="font-size:0.6rem; ">{{ $unreadCount }}</span>
-                                    @endif
+                                    <span id="notif-badge" class="badge bg-danger rounded-circle
+          position-absolute top-0 start-100 translate-middle p-1"
+                                          style="font-size:0.6rem; display:none;"></span>
                                 </a>
+
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
                                     style="min-width:300px">
                                     <li class="dropdown-header">Notifications</li>
-
-                                    @forelse($recentUnread as $note)
-                                        <li>
-                                            <a class="dropdown-item py-2 {{ $note->read_at ? '' : 'bg-light' }}"
-                                               href="{{ route('notifications.show', $note->id) }}">
-                                                <div class="small text-truncate">{{ $note->data['message'] }}</div>
-                                                <div class="small text-muted">{{ $note->created_at->diffForHumans() }}</div>
-                                            </a>
-                                        </li>
-                                    @empty
-                                        <li class="dropdown-item text-center text-muted py-3">
-                                            No new notifications
-                                        </li>
-                                    @endforelse
-
+                                    <div id="notif-list">
+                                        <li class="dropdown-item text-center text-muted py-3">Loading…</li>
+                                    </div>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item text-center"
-                                           href="{{--{{ route('notifications.index') }}--}}">
+                                        <a class="dropdown-item text-center" href="{{ route('notifications.index') }}">
                                             View All Notifications
                                         </a>
                                     </li>
                                 </ul>
                             </li>
+
 
                             <!-- User -->
                             <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -142,3 +128,69 @@
                 @endif
             </nav>
             <!-- / Navbar -->
+            @push('scripts')
+                <script>
+                  document.addEventListener('DOMContentLoaded', () => {
+                    const badgeEl = document.getElementById('notif-badge');
+                    const listEl  = document.getElementById('notif-list');
+
+                    const bell = document.getElementById('notificationDropdown');
+                    bell.addEventListener('shown.bs.dropdown', async () => {
+                      // 1) Tell the server to mark all as read
+                      await fetch('{{ route("notifications.readAll") }}', {
+                        method: 'POST',
+                        headers: {
+                          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                          'Accept':       'application/json'
+                        }
+                      });
+                      // 2) Hide the badge
+                      document.getElementById('notif-badge').style.display = 'none';
+                    });
+
+
+                    async function fetchNotifications() {
+                      try {
+                        const res  = await fetch('{{ route('notifications.unread') }}', {
+                          headers: { 'Accept': 'application/json' }
+                        });
+                        const json = await res.json();
+
+                        // Badge
+                        if (json.count > 0) {
+                          badgeEl.textContent = json.count;
+                          badgeEl.style.display = 'inline-block';
+                        } else {
+                          badgeEl.style.display = 'none';
+                        }
+
+                        // Dropdown list
+                        if (json.recent.length) {
+                          listEl.innerHTML = json.recent.map(n => `
+          <li>
+            <a class="dropdown-item py-2" href="/notifications/${n.id}"
+               onclick="event.preventDefault(); ">
+              <div class="small text-truncate">${n.message}</div>
+              <div class="small text-muted">${n.time}</div>
+            </a>
+          </li>
+        `).join('');
+                        } else {
+                          listEl.innerHTML = `
+          <li class="dropdown-item text-center text-muted py-3">
+            No new notifications
+          </li>
+        `;
+                        }
+                      } catch (err) {
+                        console.error('Notif fetch error', err);
+                      }
+                    }
+
+                    // Poll on load + every 30s
+                    fetchNotifications();
+                    setInterval(fetchNotifications, 30000);
+                  });
+                </script>
+    @endpush
+
