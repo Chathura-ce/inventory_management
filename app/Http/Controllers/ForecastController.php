@@ -64,18 +64,20 @@ class ForecastController extends Controller
 
         // 4) Call FastAPI
         $fastapi = config('services.fastapi.url');
+
         $response = Http::timeout(60)
             ->retry(1, 500)
             ->withOptions(['verify' => false])
-            ->post($fastapi, [
+            ->post("http://127.0.0.1:8001/predict", [
                 'item'    => $itemName,
                 'periods' => $periods,
                 'history' => $historyPayload,
             ]);
 
         if (! $response->successful()) {
+//            dd($response->body());
             return response()->json([
-                'error' => 'Forecast API error',
+                'error' => 'Forecast API error ',
                 'body'  => $response->body(),
             ], 500);
         }

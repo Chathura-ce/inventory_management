@@ -4,10 +4,12 @@
     "private": true,
     "type": "module",
     "license": "MIT",
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build"
-    },
+  "scripts": {
+    "dev": "vite",
+    "serve:laravel": "php artisan serve --host=127.0.0.1 --port=8000",
+    "serve:api": "cd forecast-api && uvicorn main:app --reload --host=127.0.0.1 --port=8001",
+    "serve": "concurrently -k -n VITE,LARAVEL,API \"npm run dev\" \"npm run serve:laravel\" \"npm run serve:api\""
+  },
     "devDependencies": {
         "@babel/core": "7.23.7",
         "@babel/plugin-syntax-dynamic-import": "7.8.3",
@@ -24,6 +26,7 @@
         "axios": "1.7.2",
         "babel-loader": "9.1.3",
         "browser-sync": "2.29.3",
+        "concurrently": "^9.2.0",
         "cross-env": "7.0.3",
         "glob": "10.4.5",
         "lodash": "4.17.21",
@@ -87,8 +90,8 @@
         "boxicons": "2.1.4",
         "highlight.js": "11.9.0",
         "jquery": "3.7.1",
+        "laravel-vite-plugin": "1.0.1",
         "masonry-layout": "4.2.2",
-        "perfect-scrollbar": "1.5.5",
-        "laravel-vite-plugin": "1.0.1"
+        "perfect-scrollbar": "1.5.5"
     }
 }
