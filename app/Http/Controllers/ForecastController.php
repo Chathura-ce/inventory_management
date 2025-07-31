@@ -5,8 +5,16 @@ use App\Models\HistoricalPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use App\Services\PriceApiService;
 class ForecastController extends Controller
 {
+    protected PriceApiService $priceApi;
+
+    public function __construct(PriceApiService $priceApi)
+    {
+        $this->priceApi = $priceApi;
+    }
+
     public function index()
     {
         $products = [
@@ -43,6 +51,15 @@ class ForecastController extends Controller
         }
         $itemName = $map[$productId];
 
+        /*2025.07.31*/
+        // Ensure cache from last stored +1 up to today
+        $last = \App\Models\HistoricalPrice::max('price_date');
+        $start = $last
+            ? Carbon::parse($last)->addDay()
+            : Carbon::today()->subWeeks($request->input('history_weeks', 52));
+        $this->priceApi->ensureCacheUpToDate($start, Carbon::today());
+
+
         // 2) Roll daily → weekly history
         $daily = HistoricalPrice::query()
             ->where('product_id', $productId)
@@ -54,7 +71,9 @@ class ForecastController extends Controller
             ->groupBy(fn($row) => Carbon::parse($row->price_date)
                 ->startOfWeek()
                 ->toDateString())
-            ->map(fn($grp) => round($grp->avg('narahenpita_retail'), 2));
+            ->map(fn($grp) => $grp->avg('narahenpita_retail'))
+            ->filter(fn($avg) => ! is_null($avg))
+            ->map(fn($avg) => round($avg, 2));;
 
         // 3) Build `history` payload
         $historyPayload = $weeklyHistory
