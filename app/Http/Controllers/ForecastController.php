@@ -63,10 +63,11 @@ class ForecastController extends Controller
             ->all();
 
         // 4) Call FastAPI
+        $fastapi = config('services.fastapi.url');
         $response = Http::timeout(60)
             ->retry(1, 500)
             ->withOptions(['verify' => false])
-            ->post('https://beans-forecast-api.onrender.com/predict', [
+            ->post($fastapi, [
                 'item'    => $itemName,
                 'periods' => $periods,
                 'history' => $historyPayload,

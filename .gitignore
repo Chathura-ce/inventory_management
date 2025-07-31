@@ -7,7 +7,7 @@
 /storage/*.key
 /vendor
 
-# .env
+ .env
 .env.backup
 .env.production
 .phpunit.result.cache
@@ -27,3 +27,4 @@ yarn-error.log
 /public/css
 /public/js
 /public/assets/~$sample-stock-import.xlsx
+/forecast-api/.venv/
