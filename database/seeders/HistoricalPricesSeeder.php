@@ -24,6 +24,8 @@ class HistoricalPricesSeeder extends Seeder
         'Nadu'           => 2,
         'Egg'           => 3,
         'Salaya'           => 4,
+        'Kelawalla'           => 5,
+        'Coconut'           => 6,
     ];
 
     /**

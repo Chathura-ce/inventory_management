@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\HistoricalPrice;
@@ -6,9 +7,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use App\Services\PriceApiService;
+
 class ForecastController extends Controller
 {
     protected PriceApiService $priceApi;
+
+    protected $products = [
+        1 => 'Beans',
+        2 => 'Nadu',
+        3 => 'Egg',
+        4 => 'Salaya',
+        5 => 'Kelawalla',
+        6 => 'Coconut',
+    ];
 
     public function __construct(PriceApiService $priceApi)
     {
@@ -17,12 +28,7 @@ class ForecastController extends Controller
 
     public function index()
     {
-        $products = [
-            1 => 'Beans',
-            2 => 'Nadu',
-            3 => 'Egg',
-            4 => 'Salaya',
-        ];
+        $products = $this->products;
 
         // Later you can replace this with:
         // $products = Product::orderBy('name')->pluck('name', 'id')->toArray();
@@ -31,33 +37,27 @@ class ForecastController extends Controller
     }
 
 
-
     public function getData(Request $request)
     {
         // 1) Map product_id → item name
-        $map = [
-            1 => 'Beans',
-            2 => 'Nadu',
-            3 => 'Egg',
-            4 => 'Salaya',
-        ];
+        $map = $this->products;
 
-        $productId    = $request->input('product_id');
+        $productId = $request->input('product_id');
         $historyWeeks = $request->input('history_weeks', 52);
-        $periods      = $request->input('steps', 4);
+        $periods = $request->input('steps', 4);
 
-        if (! isset($map[$productId])) {
+        if (!isset($map[$productId])) {
             return response()->json(['error' => 'Invalid product_id'], 400);
         }
         $itemName = $map[$productId];
 
         /*2025.07.31*/
         // Ensure cache from last stored +1 up to today
-        $last = \App\Models\HistoricalPrice::max('price_date');
+        /*$last = \App\Models\HistoricalPrice::max('price_date');
         $start = $last
             ? Carbon::parse($last)->addDay()
             : Carbon::today()->subWeeks($request->input('history_weeks', 52));
-        $this->priceApi->ensureCacheUpToDate($start, Carbon::today());
+        $this->priceApi->ensureCacheUpToDate($start, Carbon::today());*/
 
 
         // 2) Roll daily → weekly history
@@ -72,7 +72,7 @@ class ForecastController extends Controller
                 ->startOfWeek()
                 ->toDateString())
             ->map(fn($grp) => $grp->avg('narahenpita_retail'))
-            ->filter(fn($avg) => ! is_null($avg))
+            ->filter(fn($avg) => !is_null($avg))
             ->map(fn($avg) => round($avg, 2));;
 
         // 3) Build `history` payload
@@ -84,20 +84,20 @@ class ForecastController extends Controller
         // 4) Call FastAPI
         $fastapi = config('services.fastapi.url');
 
-        $response = Http::timeout(60)
+        $response = Http::timeout(120)
             ->retry(1, 500)
             ->withOptions(['verify' => false])
-            ->post("http://127.0.0.1:8001/predict", [
-                'item'    => $itemName,
+            ->post("http://127.0.0.1:8002/predict", [
+                'item' => $itemName,
                 'periods' => $periods,
                 'history' => $historyPayload,
             ]);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
 //            dd($response->body());
             return response()->json([
                 'error' => 'Forecast API error ',
-                'body'  => $response->body(),
+                'body' => $response->body(),
             ], 500);
         }
 
@@ -117,17 +117,15 @@ class ForecastController extends Controller
             ->values();
 
 
-        $actualSeries   = $labels->map(fn($d) => $weeklyHistory[$d]   ?? null);
+        $actualSeries = $labels->map(fn($d) => $weeklyHistory[$d] ?? null);
         $forecastSeries = $labels->map(fn($d) => $weeklyForecast[$d] ?? null);
 
         return response()->json([
-            'labels'   => $labels,
-            'actual'   => $actualSeries,
+            'labels' => $labels,
+            'actual' => $actualSeries,
             'forecast' => $forecastSeries,
         ]);
     }
-
-
 
 
 }
