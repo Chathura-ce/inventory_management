@@ -16,8 +16,8 @@
             <td>{{ $p['name'] }}</td>
             <td>{{ $p['unit'] }}</td>
             <td>{{ $p['on_hand'] }}</td>
-            <td>₹{{ number_format($p['unit_cost'],2) }}</td>
-            <td>₹{{ number_format($p['total_value'],2) }}</td>
+            <td>{{ number_format($p['unit_cost'],2) }} Rs</td>
+            <td>{{ number_format($p['total_value'],2) }} Rs</td>
         </tr>
     @endforeach
     </tbody>

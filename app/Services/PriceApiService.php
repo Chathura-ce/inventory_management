@@ -15,7 +15,7 @@ class PriceApiService
     {
         // e.g. https://yourapp.fly.dev
 //        $this->baseUrl = config('services.price_api.url');
-        $this->baseUrl = 'http://localhost:8002';
+        $this->baseUrl = 'http://127.0.0.1:8003';
     }
 
     /**

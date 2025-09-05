@@ -1,12 +1,13 @@
 @extends('layouts/blankLayout')
 
-@section('title', 'Login Basic - Pages')
+@section('title', 'Login')
 
 @section('page-style')
     @vite([
       'resources/assets/vendor/scss/pages/page-auth.scss'
     ])
 @endsection
+
 
 @section('content')
     <div class="container-xxl">
@@ -29,9 +30,6 @@
                                 {{ session('status') }}
                             </div>
                         @endif
-
-                        <h4 class="mb-1">Welcome to {{config('variables.templateName')}}! 👋</h4>
-                        <p class="mb-6">Please sign-in to your account and start the adventure</p>
 
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
@@ -58,19 +56,14 @@
                             </div>
 
                             <div class="mb-8">
-                                <div class="d-flex justify-content-between mt-8">
-                                    <div class="form-check mb-0 ms-2">
-                                        <input class="form-check-input" type="checkbox" id="remember-me" name="remember">
-                                        <label class="form-check-label" for="remember-me">
-                                            Remember Me
-                                        </label>
-                                    </div>
+                               {{-- <div class="d-flex justify-content-between mt-8">
+
                                     @if (Route::has('password.request'))
                                         <a href="{{ route('password.request') }}">
                                             <span>Forgot Password?</span>
                                         </a>
                                     @endif
-                                </div>
+                                </div>--}}
                             </div>
 
                             <div class="mb-6">

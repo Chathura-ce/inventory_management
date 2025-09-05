@@ -11,7 +11,9 @@ use App\Http\Controllers\StockHistoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+//    return view('welcome');
+    return view('auth.login');
+
 });
 
 //Route::get('/dashboard', function () {
@@ -64,6 +66,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('notifications/{id}/read',  [NotificationController::class,'markRead'])->name('notifications.read');
     Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])
         ->name('notifications.readAll');
+    Route::get('/forecast/diag', [\App\Http\Controllers\ForecastController::class, 'diag']);
+
 
 });
 

@@ -21,7 +21,7 @@
                         <th>Name</th>
                         <th>SKU</th>
                         <th>Qty</th>
-                        <th>Price</th>
+                        <th>Price(Rs)</th>
                         <th>Unit</th>
                         <th>Actions</th>
                     </tr>
@@ -32,7 +32,7 @@
                             <td>{{ $product->name }}</td>
                             <td>{{ $product->sku }}</td>
                             <td>{{ $product->quantity }}</td>
-                            <td>${{ number_format($product->price, 2) }}</td>
+                            <td>{{ number_format($product->price, 2) }}</td>
                             <td>{{ $product->unit }}</td>
                             <td>
                                 <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-warning">Edit</a>

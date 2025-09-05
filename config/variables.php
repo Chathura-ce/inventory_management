@@ -2,9 +2,9 @@
   // Variables
   return [
     "creatorName" => "ThemeSelection",
-    "creatorUrl" => "https://themeselection.com",
-    "templateName" => "sneat",
-    "templateSuffix" => "Bootstrap Dashboard FREE",
+    "creatorUrl" => "http://127.0.0.1:8000/dashboard",
+    "templateName" => "RetailVista",
+    "templateSuffix" => "Inventory management",
     "templateVersion" => "2.0.0",
     "templateFree" => true,
     "templateDescription" => "Most Powerful & Comprehensive Bootstrap 5 HTML Admin Dashboard Template built for developers!",

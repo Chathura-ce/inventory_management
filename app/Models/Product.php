@@ -26,5 +26,17 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    public function adjustStock(int $deltaQty, string $source): void
+    {
+        // 1) Ledger row
+        \App\Models\StockEntry::create([
+            'product_id' => $this->id,
+            'quantity'   => $deltaQty,   // may be negative
+            'source'     => $source,
+        ]);
+
+        // 2) Update on-hand stock
+        $this->increment('quantity', $deltaQty);
+    }
 
 }

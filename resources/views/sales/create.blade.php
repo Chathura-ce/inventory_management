@@ -157,7 +157,7 @@
               `;
             cartTbody.append(tr);
           });
-          grandTotal.textContent = `₹${total.toFixed(2)}`;
+          grandTotal.textContent = `${total.toFixed(2)}Rs`;
         }
 
         // 5. Complete sale via AJAX

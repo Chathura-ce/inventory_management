@@ -13,10 +13,11 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        $categories = ['Rice', 'Dhal', 'Sugar', 'Beans', 'Flour', 'Salt'];
+//        $categories = ['Rice', 'Dhal', 'Sugar', 'Beans', 'Flour', 'Salt','Fish'];
+        $categories = ['Grains & Cereals', 'Pulses & Legumes', 'Sugar & Sweeteners', 'Eggs & Dairy', 'Vegetables', 'Fish','Oils & Fats','Meat & Poultry','Tea'];
 
         foreach ($categories as $name) {
-            Category::create(['name' => $name]);
+            Category::firstOrCreate(['name' => $name]);
         }
     }
 }

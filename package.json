@@ -6,6 +6,7 @@
     "license": "MIT",
   "scripts": {
     "dev": "vite",
+      "build": "vite build",
     "serve:laravel": "php artisan serve --host=127.0.0.1 --port=8000",
     "serve:api": "cd forecast-api && uvicorn main:app --reload --host=127.0.0.1 --port=8001",
     "serve": "concurrently -k -n VITE,LARAVEL,API \"npm run dev\" \"npm run serve:laravel\" \"npm run serve:api\""

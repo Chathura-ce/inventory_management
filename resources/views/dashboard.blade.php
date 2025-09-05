@@ -21,7 +21,7 @@
             <div class="card text-white bg-primary">
                 <div class="card-body">
                     <h5 class="card-title">Today's Sales</h5>
-                    <p class="card-text fs-3">₹{{ number_format($todaySales,2) }}</p>
+                    <p class="card-text fs-3">{{ number_format($todaySales,2) }} Rs</p>
                     <small>{{ $todayOrders }} orders</small>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="card text-white bg-success">
                 <div class="card-body">
                     <h5 class="card-title">This Week's Sales</h5>
-                    <p class="card-text fs-3">₹{{ number_format($weekSales,2) }}</p>
+                    <p class="card-text fs-3">{{ number_format($weekSales,2) }} Rs</p>
                     <small>{{ $weekOrders }} orders</small>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                     <h5 class="card-title">Top Product (7d)</h5>
                     @if($topProduct)
                         <p class="card-text fs-4">Product ID: {{ $topProduct->product_id }}</p>
-                        <small>Revenue: ₹{{ number_format($topProduct->revenue,2) }}</small>
+                        <small>Revenue: {{ number_format($topProduct->revenue,2) }} Rs</small>
                     @else
                         <p class="card-text">—</p>
                     @endif

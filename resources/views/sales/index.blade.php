@@ -26,7 +26,7 @@
                 <tr>
                     <th>Date</th>
                     <th>Items</th>
-                    <th class="text-end">Total (₹)</th>
+                    <th class="text-end">Total (Rs)</th>
                     <th></th>
                 </tr>
                 </thead>

@@ -139,8 +139,8 @@
             r=>`<tr>
           <td>${r.period}</td>
           <td>${r.orders}</td>
-          <td>₹${parseFloat(r.revenue).toFixed(2)}</td>
-          <td>₹${parseFloat(r.avg_order_value).toFixed(2)}</td>
+          <td>${parseFloat(r.revenue).toFixed(2)}Rs</td>
+          <td>${parseFloat(r.avg_order_value).toFixed(2)}Rs</td>
         </tr>`
           );
         });
@@ -159,8 +159,8 @@
           <td>${r.name}</td>
           <td>${r.unit}</td>
           <td>${r.on_hand}</td>
-          <td>₹${parseFloat(r.unit_cost).toFixed(2)}</td>
-          <td>₹${parseFloat(r.total_value).toFixed(2)}</td>
+          <td>${parseFloat(r.unit_cost).toFixed(2)} Rs</td>
+          <td>${parseFloat(r.total_value).toFixed(2)} Rs</td>
         </tr>`
           );
         });

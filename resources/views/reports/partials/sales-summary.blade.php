@@ -14,8 +14,8 @@
         <tr>
             <td>{{ $row->period }}</td>
             <td>{{ $row->orders }}</td>
-            <td>₹{{ number_format($row->revenue,2) }}</td>
-            <td>₹{{ number_format($row->avg_order_value,2) }}</td>
+            <td>{{ number_format($row->revenue,2) }} Rs</td>
+            <td>{{ number_format($row->avg_order_value,2) }} Rs</td>
         </tr>
     @endforeach
     </tbody>

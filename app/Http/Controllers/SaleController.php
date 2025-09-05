@@ -54,9 +54,8 @@ class SaleController extends Controller
 
             $total = 0;
             foreach ($cleanItems as $it) {
-                $product = Product::findOrFail($it['product_id']);
+                $product = Product::lockForUpdate()->findOrFail($it['product_id']);
 
-                // stock check → JSON error if fails
                 if ($it['qty'] > $product->quantity) {
                     throw new HttpResponseException(
                         response()->json(
@@ -69,11 +68,9 @@ class SaleController extends Controller
                 $lineTotal = $product->price * $it['qty'];
                 $total    += $lineTotal;
 
-                // decrement stock
-//                $product->decrement('quantity', $it['qty']);
-                $product->quantity -= $it['qty'];
-                $product->save();
-                // create each line‐item
+                // ↓↓↓ single call writes ledger & updates product.qty
+                $product->adjustStock(-$it['qty'], 'sale');
+
                 SaleItem::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $product->id,
@@ -82,6 +79,7 @@ class SaleController extends Controller
                     'line_total' => $lineTotal,
                 ]);
             }
+
 
             // update the final total on the header
             $sale->update(['total_amount' => $total]);

@@ -6,8 +6,8 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Add Stock</h5>
-            <div>
-                <a href="{{ asset('sample-stock-import.xlsx') }}" class="btn btn-outline-secondary" download>
+            <div style="display: none;">
+                <a href="{{ asset('assets/sample-stock-import.xlsx') }}" class="btn btn-outline-secondary" download>
                     Download Excel Format
                 </a>
             </div>
@@ -55,7 +55,7 @@
             </form>
 
             <!-- Excel Import -->
-            <div class="mb-4">
+            <div style="display: none" class="mb-4">
                 <label class="form-label">Import from Excel</label>
                 <input type="file" id="excelInput" class="form-control" accept=".xlsx,.xls,.csv">
             </div>
