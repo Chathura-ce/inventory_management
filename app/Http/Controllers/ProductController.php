@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\HistoricalPrice;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -27,21 +28,29 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sku' => 'required|string|max:100|unique:products,sku',
-            'category' => 'nullable|string|max:100',
+            'category_id' => 'required|exists:categories,id',
             'quantity' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'unit' => 'nullable|string|max:20',
+            'unit' => 'required|string|max:20',
             'min_stock_alert' => 'nullable|integer|min:0',
             'max_stock' => 'nullable|integer|min:0',
             'image' => 'nullable|image|max:2048'
+        ], [
+            'category_id.required' => 'Please select a category.',
+            'sku.unique' => 'This SKU is already in use.',
         ]);
 
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('products', 'public');
         }
-
-        Product::create($validated);
+        $product = Product::create($validated);
+        // log into historical_prices
+        HistoricalPrice::create([
+            'product_id' => $product->id,
+            'price_date' => now()->toDateString(),
+            'narahenpita_retail' => $validated['price'],
+        ]);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
@@ -62,7 +71,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => 'required|exists:categories,id',
             'quantity' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
@@ -70,6 +79,9 @@ class ProductController extends Controller
             'min_stock_alert' => 'nullable|integer|min:0',
             'max_stock' => 'nullable|integer|min:0',
             'image' => 'nullable|image|max:2048'
+        ], [
+            'category_id.required' => 'Please select a category.',
+            'sku.unique' => 'This SKU is already in use.',
         ]);
 
         if ($request->hasFile('image')) {
@@ -77,6 +89,20 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($product->image_path);
             }
             $validated['image_path'] = $request->file('image')->store('products', 'public');
+        }
+
+        // before $product->update($validated);
+        if ($validated['price'] != $product->price) {
+            HistoricalPrice::updateOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'price_date' => now()->toDateString(),
+                ],
+                [
+                    'narahenpita_retail' => $validated['price'],
+                    'currency' => 'LKR',
+                ]
+            );
         }
 
         $product->update($validated);

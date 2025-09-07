@@ -79,7 +79,7 @@
                     @error('description') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3" style="display: none">
                     <label class="form-label">Product Image</label><br>
                     @if($product->image_path)
                         <img src="{{ asset('storage/' . $product->image_path) }}" width="100" class="mb-2" />

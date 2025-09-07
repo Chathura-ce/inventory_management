@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="mb-3">
+                    <div class="mb-3 col-md-4">
                         <label class="form-label">Category</label>
                         <select name="category_id" class="form-control">
                             <option value="">-- Select Category --</option>
@@ -36,15 +36,16 @@
                                 </option>
                             @endforeach
                         </select>
+                        @error('category_id') <small class="text-danger">{{ $message }}</small> @enderror
                     </div>
 
 
-                    <div class="mb-3 col-md-3">
+                    <div class="mb-3 col-md-4">
                         <label class="form-label">Quantity *</label>
                         <input type="number" name="quantity" value="{{ old('quantity') }}" class="form-control" required>
                     </div>
 
-                    <div class="mb-3 col-md-3">
+                    <div class="mb-3 col-md-4">
                         <label class="form-label">Unit</label>
                         <input type="text" name="unit" value="{{ old('unit') }}" class="form-control">
                     </div>
@@ -72,7 +73,7 @@
                     <textarea name="description" class="form-control">{{ old('description') }}</textarea>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3" style="display: none;">
                     <label class="form-label">Product Image</label>
                     <input type="file" name="image" class="form-control">
                 </div>
