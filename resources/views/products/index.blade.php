@@ -23,6 +23,7 @@
                         <th>Qty</th>
                         <th>Price(Rs)</th>
                         <th>Unit</th>
+                        <th>Historical Prices</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -34,6 +35,11 @@
                             <td>{{ $product->quantity }}</td>
                             <td>{{ number_format($product->price, 2) }}</td>
                             <td>{{ $product->unit }}</td>
+                            <td>
+                                <a href="{{ route('historical-prices.index', $product->id) }}" class="btn btn-sm btn-info">
+                                    View
+                                </a>
+                            </td>
                             <td>
                                 <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-warning">Edit</a>
                                 <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline"

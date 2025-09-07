@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\HistoricalPrice;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;           // <-- add
@@ -15,6 +16,14 @@ class ForecastController extends Controller
 {
     protected PriceApiService $priceApi;
 
+    /*protected $products = [
+        1 => 'Beans',
+        // 2 => 'Nadu',
+        3 => 'Egg',
+        4 => 'Salaya',
+        5 => 'Kelawalla',
+        6 => 'Coconut',
+    ];*/
     protected $products = [
         1 => 'Beans',
         // 2 => 'Nadu',
@@ -27,11 +36,13 @@ class ForecastController extends Controller
     public function __construct(PriceApiService $priceApi)
     {
         $this->priceApi = $priceApi;
+        $this->products =  Product::where('predict', 1)->pluck('name', 'id');;
     }
 
     public function index()
     {
-        $products = $this->products;
+//        $products = $this->products;
+        $products = Product::where('predict', 1)->pluck('name', 'id');
         return view('forecast.index', compact('products'));
     }
 
@@ -191,4 +202,83 @@ class ForecastController extends Controller
         }
     }
 
+    function accuracy()
+    {
+        $id = 10;
+        $history = HistoricalPrice::where('product_id', $id)
+            ->orderBy('price_date')
+            ->pluck('narahenpita_retail', 'price_date');
+
+        // need at least 760 days (730 + 30)
+        if ($history->count() >= 760) {
+            // take last 760 days
+            $last760 = $history->slice($history->count() - 760);
+
+            // split: first 730 for input, last 30 for evaluation
+            $trainWindow = $last760->slice(0, 730);
+            $expected    = $last760->slice(730); // 30 days
+
+            // prepare API payload
+            $historyPayload = collect($trainWindow)->map(
+                fn($y,$ds)=>['ds'=>$ds,'y'=>(float)$y]
+            )->values()->all();
+
+            $predictions = $this->priceApi->predict($historyPayload);
+
+            // ensure expected is array with numeric keys
+            $expectedArr = array_values($expected->toArray());
+
+            $metrics = $this->calculateMetrics($expectedArr, $predictions);
+
+            return ['last_accuracy' => 100-$metrics['mape']];
+        }
+    }
+
+    function calculateMetrics(array $actual, array $predicted): array
+    {
+        $n = count($actual);
+
+        if ($n === 0 || $n !== count($predicted)) {
+            return [
+                'mae'   => null,
+                'rmse'  => null,
+                'mape'  => null,
+                'smape' => null,
+            ];
+        }
+
+        $mae = 0.0;
+        $rmse = 0.0;
+        $mape = 0.0;
+        $smape = 0.0;
+
+        foreach ($actual as $i => $yTrue) {
+            $yPred = $predicted[$i];
+
+            $error = $yTrue - $yPred;
+
+            // Mean Absolute Error
+            $mae += abs($error);
+
+            // Root Mean Squared Error
+            $rmse += pow($error, 2);
+
+            // Mean Absolute Percentage Error (skip zero actuals)
+            if ($yTrue != 0) {
+                $mape += abs($error / $yTrue);
+            }
+
+            // Symmetric MAPE (skip both zero actual+pred)
+            if (($yTrue + $yPred) != 0) {
+                $smape += abs($yPred - $yTrue) / (($yTrue + $yPred) / 2.0);
+            }
+        }
+
+        return [
+            'mae'   => $mae / $n,
+            'rmse'  => sqrt($rmse / $n),
+            'mape'  => ($mape / $n) * 100,   // percentage
+            'smape' => ($smape / $n) * 100, // percentage
+        ];
+    }
 }

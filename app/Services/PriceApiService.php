@@ -72,4 +72,25 @@ class PriceApiService
             }
         }
     }
+
+    public function predict(array $history, int $horizon = 30, string $aggregate = 'daily'): array
+    {
+        $apiUrl = rtrim(config('services.fastapi.url'), '/');
+
+        $resp = Http::timeout(120)->retry(1, 500)->withOptions(['verify' => false])
+            ->post($apiUrl.'/predict', [
+                'item'      => 'Test',
+                'history'   => $history,
+                'horizon'   => $horizon,
+                'aggregate' => $aggregate,
+            ]);
+
+        if (!$resp->successful()) {
+            throw new \Exception("Forecast API error: ".$resp->status()." ".$resp->body());
+        }
+
+        return collect($resp->json()['predictions'] ?? [])
+            ->pluck('yhat')
+            ->all();
+    }
 }

@@ -42,7 +42,7 @@ class ProductSeeder extends Seeder
             'name'        => 'Egg',
             'sku'         => 'EGG-001',
             'unit'        => 'pcs',
-            'category'    => 'Eggs & Dairy',   // adjust if you renamed
+            'category'    => 'Eggs & Dairy',
             'quantity'    => 600,
             'price'       => 37.00,
             'min_stock'   => 100,
@@ -62,7 +62,6 @@ class ProductSeeder extends Seeder
             'description' => 'Fresh Salaya fish – cleaned and iced.',
             'image'       => null,
         ],
-        // ── NEW ITEMS ───────────────────────────────────────────────
         [
             'name'        => 'Kelawalla',
             'sku'         => 'KEL-001',
@@ -87,7 +86,69 @@ class ProductSeeder extends Seeder
             'description' => 'Whole mature coconuts for retail sale.',
             'image'       => null,
         ],
+        // New items
+        [
+            'name'        => 'Carrot',
+            'sku'         => 'CAR-007',
+            'unit'        => 'kg',
+            'category'    => 'Vegetables',
+            'quantity'    => 70,
+            'price'       => 180.00,
+            'min_stock'   => 15,
+            'max_stock'   => 250,
+            'description' => 'Fresh orange carrots, ideal for cooking and salads.',
+            'image'       => null,
+        ],
+        [
+            'name'        => 'Cabbage',
+            'sku'         => 'CAB-008',
+            'unit'        => 'kg',
+            'category'    => 'Vegetables',
+            'quantity'    => 80,
+            'price'       => 160.00,
+            'min_stock'   => 20,
+            'max_stock'   => 300,
+            'description' => 'Green cabbage, fresh and crisp.',
+            'image'       => null,
+        ],
+        [
+            'name'        => 'Tomato',
+            'sku'         => 'TOM-009',
+            'unit'        => 'kg',
+            'category'    => 'Vegetables',
+            'quantity'    => 90,
+            'price'       => 200.00,
+            'min_stock'   => 20,
+            'max_stock'   => 350,
+            'description' => 'Ripe red tomatoes for cooking and salads.',
+            'image'       => null,
+        ],
+        [
+            'name'        => 'Brinjal',
+            'sku'         => 'BRI-010',
+            'unit'        => 'kg',
+            'category'    => 'Vegetables',
+            'quantity'    => 60,
+            'price'       => 190.00,
+            'min_stock'   => 15,
+            'max_stock'   => 220,
+            'description' => 'Fresh purple brinjals (eggplants).',
+            'image'       => null,
+        ],
+        [
+            'name'        => 'Pumpkin',
+            'sku'         => 'PUM-011',
+            'unit'        => 'kg',
+            'category'    => 'Vegetables',
+            'quantity'    => 50,
+            'price'       => 140.00,
+            'min_stock'   => 10,
+            'max_stock'   => 200,
+            'description' => 'Locally grown pumpkin, sweet and fresh.',
+            'image'       => null,
+        ],
     ];
+
 
 
     public function run(): void

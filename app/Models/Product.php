@@ -20,6 +20,7 @@ class Product extends Model
         'min_stock_alert',
         'max_stock',
         'image_path',
+        'predict'
     ];
 
     public function category()
@@ -37,6 +38,11 @@ class Product extends Model
 
         // 2) Update on-hand stock
         $this->increment('quantity', $deltaQty);
+    }
+
+    public function historicalPrices()
+    {
+        return $this->hasMany(\App\Models\HistoricalPrice::class);
     }
 
 }

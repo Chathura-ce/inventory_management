@@ -54,22 +54,30 @@
                 </div>
 
                 <div class="row">
-                    <div class="mb-3 col-md-4">
+                    <div class="mb-3 col-md-3">
                         <label class="form-label">Price *</label>
                         <input type="number" step="0.01" name="price" value="{{ old('price', $product->price) }}" class="form-control" required>
                         @error('price') <small class="text-danger">{{ $message }}</small> @enderror
                     </div>
 
-                    <div class="mb-3 col-md-4">
+                    <div class="mb-3 col-md-3">
                         <label class="form-label">Min Stock Alert</label>
                         <input type="number" name="min_stock_alert" value="{{ old('min_stock_alert', $product->min_stock_alert) }}" class="form-control">
                         @error('min_stock_alert') <small class="text-danger">{{ $message }}</small> @enderror
                     </div>
 
-                    <div class="mb-3 col-md-4">
+                    <div class="mb-3 col-md-3">
                         <label class="form-label">Max Stock</label>
                         <input type="number" name="max_stock" value="{{ old('max_stock', $product->max_stock) }}" class="form-control">
                         @error('max_stock') <small class="text-danger">{{ $message }}</small> @enderror
+                    </div>
+                    <div class="mb-3 col-md-3">
+                        <label class="form-label">Enable Prediction?</label>
+                        <select name="predict" class="form-control">
+                            <option value="0" {{ old('predict', $product->predict ?? 0) == 0 ? 'selected' : '' }}>No</option>
+                            <option value="1" {{ old('predict', $product->predict ?? 0) == 1 ? 'selected' : '' }}>Yes</option>
+                        </select>
+                        @error('predict') <small class="text-danger">{{ $message }}</small> @enderror
                     </div>
                 </div>
 

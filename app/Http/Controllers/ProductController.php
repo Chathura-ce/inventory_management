@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\HistoricalPrice;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -78,17 +79,42 @@ class ProductController extends Controller
             'unit' => 'nullable|string|max:20',
             'min_stock_alert' => 'nullable|integer|min:0',
             'max_stock' => 'nullable|integer|min:0',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
+            'predict' => 'required|boolean',
         ], [
             'category_id.required' => 'Please select a category.',
             'sku.unique' => 'This SKU is already in use.',
+            'predict.required' => 'Predict is required',
         ]);
+
+        // 🚨 Business validation for predict
+        if ($request->predict == 1) {
+            $historyCount = \App\Models\HistoricalPrice::where('product_id', $product->id)->count();
+
+            if ($historyCount < 730) {
+                return back()
+                    ->withErrors(['predict' => 'Prediction can only be enabled if the product has at least 730 days of historical prices.'])
+                    ->withInput();
+            }
+        }
 
         if ($request->hasFile('image')) {
             if ($product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
             }
             $validated['image_path'] = $request->file('image')->store('products', 'public');
+        }
+
+        if ($validated['quantity'] != $product->quantity) {
+            $difference = $validated['quantity'] - $product->quantity;
+
+            DB::table('stock_entries')->insert([
+                'product_id' => $product->id,
+                'quantity'   => $difference,
+                'source'       => $difference > 0 ? 'adjustment_in' : 'adjustment_out',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
         // before $product->update($validated);

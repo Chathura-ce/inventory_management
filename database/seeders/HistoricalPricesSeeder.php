@@ -26,6 +26,11 @@ class HistoricalPricesSeeder extends Seeder
         'Salaya'           => 4,
         'Kelawalla'           => 5,
         'Coconut'           => 6,
+        'Carrot'           => 7,
+        'Cabbage'           => 8,
+        'Tomato'           => 9,
+        'Brinjal'           => 10,
+        'Pumpkin'           => 11,
     ];
 
     /**
@@ -40,7 +45,7 @@ class HistoricalPricesSeeder extends Seeder
 
     public function run(): void
     {
-        HistoricalPrice::truncate();
+//        HistoricalPrice::truncate();
         if (! File::exists(base_path($this->csvPath))) {
             $this->command->error("CSV file not found: {$this->csvPath}");
             return;

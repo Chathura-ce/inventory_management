@@ -41,6 +41,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/forecast', [\App\Http\Controllers\ForecastController::class, 'index'])->name('forecast.index');
     Route::post('/forecast/data', [\App\Http\Controllers\ForecastController::class, 'getData'])->name('forecast.data');
+    Route::get('/forecast/accuracy', [\App\Http\Controllers\ForecastController::class, 'accuracy'])->name('forecast.accuracy');
 
     Route::resource('sales', SaleController::class)
         ->only(['index','create','store','show']);
@@ -67,7 +68,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])
         ->name('notifications.readAll');
     Route::get('/forecast/diag', [\App\Http\Controllers\ForecastController::class, 'diag']);
-
+    Route::get('/products/{product}/historical-prices', [\App\Http\Controllers\HistoricalPriceController::class, 'index'])
+        ->name('historical-prices.index');
 
 });
 
